@@ -1,0 +1,37 @@
+<HTML>
+
+<head>
+  <title>Milestone 1- First link</title>
+  <script src="jquery-3.3.1.min.js"></script>
+</head>
+
+<body>
+  <div id="Title"></div>
+  <div id="ID"></div>
+  <div id="SubTitle"></div>
+  <div id="Description"></div>
+  <div id="Image"></div>
+  <div id="isbn"></div>
+
+
+
+
+  <script>
+    $(function() {
+      $.getJSON("json1.json", function(json) //retrieve json file
+        {
+          var ebooks = "";
+
+          for (i in json.Books.Title) {
+            ebooks += "<br>" + json.Books.Title[i].SubTitle + " - " + json.Books[i].Description;
+          }
+          $("#Title").html(ebooks);
+        });
+    })
+  </script>
+
+
+
+</body>
+
+</HTML>
