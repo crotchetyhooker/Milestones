@@ -1,0 +1,52 @@
+<HTML>
+
+<head>
+  <title>Milestone 1- First link</title>
+  <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+
+  <style>
+    p {
+      font-family: 'Source Sans Pro',
+      sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <center><u><h1><text id="title"></text></h1></u>
+    <i><text id="subtitle"></text></i>
+    <p>
+      <div id="smallThumbnail"></div>
+
+      <div id="smallThumbnail"></div> By:
+      <text id="authors"></text> <br> Publisher: <text id="publisher"></text> <br> Date of Publication: <text id="publishedDate"><br></text>Page Count: <text id="pageCount"></text>
+      <p>
+  </center>
+  <h2>Description:</h2>
+  <div id="description"></div>
+
+
+
+
+  <script>
+    //fetches data from JSON file
+
+    $.ajax({
+      url: "https://www.googleapis.com/books/v1/volumes/Wfan6L9RGgYC"
+    }).done(function(data) {
+      var ebooks = data;
+      $('#title').append(ebooks.volumeInfo.title);
+      $('#subtitle').append(ebooks.volumeInfo.subtitle);
+      $('#authors').append(ebooks.volumeInfo.authors);
+      $('#publisher').append(ebooks.volumeInfo.publisher);
+      $('#publishedDate').append(ebooks.volumeInfo.publishedDate);
+      $('#description').append(ebooks.volumeInfo.description);
+      $('#pageCount').append(ebooks.volumeInfo.pageCount);
+      $('#smallThumbnail').append("<img src='" + ebooks.volumeInfo.imageLinks.smallThumbnail + "' />");
+
+    });
+  </script>
+</body>
+
+</HTML>

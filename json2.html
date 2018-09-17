@@ -1,0 +1,27 @@
+<HTML>
+
+<head>
+  <title>Milestone 1- Second link</title>
+  <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+</head>
+
+<body>
+  <div id="booklist"></div>
+
+  <script>
+    //fetches data from JSON file
+    $.ajax({
+      url: "http://it-ebooks-api.info/v1/search/modern%20web"
+    }).done(function(data) {
+
+      $.each(data.Books, function(index, element) {
+        $('#booklist').append("<h1>" + element.Title + " " + element.SubTitle + "</h1><br>" + "<img src=" + element.Image + " float=\"left\">" +
+          "<h3>" + element.Description + "</h3><p>");
+      });
+
+
+    });
+  </script>
+</body>
+
+</HTML>
