@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <style>
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      display: inline;
+    }
+  </style>
+</head>
+
+<body>
+  <center>
+    <ul>
+      <li><a href="home.html">Home</a></li>
+      <li><a href="bookshelf.html">My Bookshelf</a></li>
+      <li><a href="index.html">Main Page</a></li>
+    </ul>
+    <p>
+      <p>
+        <form><input type="text" id="booksearch" name="booksearch"><input type="button" id="submit" value="Search"></form>
+        <p>
+          <p>
+
+            <div id="radio">
+              Page number:<br>
+              <input type="radio" value="1" name="page" id="1" checked="checked">1
+              <input type="radio" value="2" name="page" id="2">2
+              <input type="radio" value="3" name="page" id="3">3
+              <input type="radio" value="3" name="page" id="3">4
+            </div>
+          </p>
+
+          <div id="results" style="display: flex; flex-wrap: wrap;"></div>
+  </center>
+
+
+  <!--Script info begin-->
+  <script>
+    $(document).ready(function() {
+      $("#booksearch").keypress(function(event) {
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          $("#submit").click();
+        }
+      });
+      $('#submit, input[type="radio"]').click(function(search) {
+        if (this.id == "#submit") {
+          search.preventDefault();
+        }
+        var term = $("#booksearch").val();
+        var page = document.getElementsByName("page");
+
+        if (page[0].checked) {
+          var parameter = "?q=" + term + "&startIndex=0&maxResults=16";
+        } else if (page[1].checked) {
+          var parameter = "?q=" + term + "&startIndex=16&maxResults=16";
+        } else if (page[2].checked) {
+          var parameter = "?q=" + term + "&startIndex=31&maxResults=16";
+        } else if (page[3].checked) {
+          var parameter = "?q=" + term + "&startIndex=46&maxResults=16";
+        } else if (page[4].checked) {
+          var parameter = "?q=" + term + "&startIndex=0&maxResults=16";
+        }
+
+        var service_point = "https://www.googleapis.com/books/v1/volumes/" + parameter;
+        $.getJSON(service_point, function(json) {
+          console.log(json);
+          var total = json.totalItems;
+          $("#total").text(total);
+          var resultHTML = "";
+          for (i in json.items) {
+            var booktitle = json.items[i].volumeInfo.title;
+            var bookid = json.items[i].id;
+            var cover = "";
+            if (json.items[i].volumeInfo.imageLinks != null)
+              cover = json.items[i].volumeInfo.imageLinks.smallThumbnail;
+
+            resultHTML += "<div class='bookdiv'>";
+            resultHTML += "<img src='" + cover + "' style='float: left' />";
+            resultHTML += "<a href='bookinfo.html?id=" + bookid + "'>" + booktitle + "</a>";
+            resultHTML += "</div>";;
+          }
+          $("#results").html(resultHTML);
+          $(".bookdiv").css("width", "300px");
+
+        });
+      });
+    });
+  </script>
+
+</body>
+
+</html>
