@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Term Project</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <!--pulls jquery-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.0/mustache.min.js"></script>
+  <!--pulls mustache template-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+  <!--pulls bootstrap-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+
+  <script id="resultTemplate" type="text/template">
+    <!-- initial result template-->
+    {{#results}}
+    <div class="listitem" dataid={{id}}>
+      <div class="resultHeader" dataid={{id}}>
+        <img src="https://image.tmdb.org/t/p/w500/{{poster_path}}{{profile_path}}" width=50> <b>{{title}}{{name}}</b> {{#media_type}} - {{media_type}}{{/media_type}}
+      </div>
+      <div class='resultdetails' style='display:none'></div>
+    </div>
+    {{/results}}
+  </script>
+
+  <script id="detailedTemplate" type="text/template">
+    <!--detailed template-->
+    <p><b>Overview:</b>{{overview}}<br> <b>Release Date:</b>{{release_date}}<br> <b>Popularity:</b>{{popularity}}<br><b>Original Language:</b> {{original_language}} {{^overview}}
+      <p><u>Known for:</u> {{#known_for}}{{title}}, {{/known_for}} {{/overview}}
+  </script>
+
+
+  <!--Event scripts-->
+
+  <script>
+    $(document).ready(function() {
+      $("#searchTerm").keypress(function(event) {
+        if (event.keyCode === 13) {
+          event.preventDefault();
+          $("#btnSearch").click();
+        }
+      });
+
+      $('#btnSearch, input[type="radio"]').click(function() {
+        if (this.id == "#btnSearch") {
+          search.preventDefault();
+        }
+        var term = $("#searchTerm").val();
+        var parameter = "&query=" + term;
+        var page = document.getElementsByName("page");
+
+        if (page[0].checked) {
+          var limit = "";
+        } else if (page[1].checked) {
+          var limit = "&page=2";
+        } else if (page[2].checked) {
+          var limit = "&page=3";
+        } else if (page[3].checked) {
+          var limit = "&page=4";
+        } else if (page[4].checked) {
+          var limit = "&page=5";
+        } else if (page[5].checked) {
+          var limit = "&page=6";
+        }
+
+        var service_point = "https://api.themoviedb.org/3/";
+        var searchResults = service_point + "search/multi?api_key=79c18aabe1696c8160cc110d25f901d6" + limit + parameter;
+        $.getJSON(searchResults, function(searchResultsJson) {
+          var template = $('#resultTemplate').html();
+          var html = Mustache.render(template, searchResultsJson);
+          $("#resultList").html(html);
+          $(".resultHeader").on('click', function() {
+            div = $(this).next(); // get the book details div, which is immediately following the header div
+            getItemDetails(searchResultsJson, $(this).attr("dataid"), div);
+          });
+        });
+
+        $("#thisYear").show(function() {
+          url = service_point + "discover/movie?api_key=79c18aabe1696c8160cc110d25f901d6&sort_by=popularity.desc&primary_release_year=2018";
+          discoverResult(url);
+        });
+      });
+
+
+      $("#discovery").click(function() {
+        year = $("#discoverResults").val();
+        media = $("#mediaType").val();
+        url = "https://api.themoviedb.org/3/discover/" + media + "?api_key=79c18aabe1696c8160cc110d25f901d6&sort_by=popularity.desc&primary_release_year=" + year;
+        $.getJSON(url, function(urlJson) {
+          var template = $('#resultTemplate').html();
+          var html = Mustache.render(template, urlJson);
+          $("#resultsList").html(html);
+          $(".resultHeader").on('click', function() {
+            div = $(this).next(); // get the book details div, which is immediately following the header div
+            getItemDetails(urlJson, $(this).attr("dataid"), div);
+          });
+        });
+      });
+
+      $("#TVShows").click(function() {
+        url = "https://api.themoviedb.org/3/tv/popular?api_key=53dad4c9b5672542ef46b75caa820412&language=en-US&page=1"
+        $.getJSON(url, function(urlJson) {
+          var template = $('#resultTemplate').html();
+          var html = Mustache.render(template, urlJson);
+          $("#shows").html(html);
+          $(".resultHeader").on('click', function() {
+            div = $(this).next(); // get the book details div, which is immediately following the header div
+            getItemDetails(urlJson, $(this).attr("dataid"), div);
+          });
+        });
+      });
+
+
+
+    });
+
+    function getItemDetails(searchResults, dataid, div) {
+      // it's best we issue another AJAX requet to the Books API to get book details. I just simply used the information from the search results.
+      var template = $('#detailedTemplate').html();
+      $.each(searchResults.results, function(index, results) {
+        if (results.id == dataid) {
+          var html = Mustache.render(template, searchResults.results[index]);
+          $(div).html(html);
+          $(div).slideToggle();
+        }
+      })
+    }
+  </script>
+
+  <!--end scripts-->
+
+  <style>
+    #header {
+      background-color: #97E300;
+      top: 0;
+      left: 0px;
+      width: 100%;
+      padding: 0px;
+    }
+
+
+    .resultdetails {
+      border: thin solid #66ddee;
+      padding: 10px;
+      margin: 10px;
+      background-color: white;
+    }
+
+    .listitem {
+      border: thin solid gray;
+      background-color: #F2FFE5;
+      margin: 1px;
+
+    }
+
+
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <div id="header">
+        <center>
+          <h1>Search for movies and TV shows here!</h1>
+          <p>
+            <p>
+
+
+      </div>
+    </div>
+  </div>
+  </center>
+
+
+  <div class="container">
+    <div class="row">
+
+      <div class="col-sm-4" style="background-color:yellow;">
+        <center>
+          <p>
+            <p>
+              <input type="text" id="searchTerm" />
+              <input type="button" id="btnSearch" value="Search" />
+              <div id="radio">
+                Page number:<br>
+                <input type="radio" value="1" name="page" id="1" checked="checked">1
+                <input type="radio" value="2" name="page" id="2">2
+                <input type="radio" value="3" name="page" id="3">3
+                <input type="radio" value="4" name="page" id="4">4
+                <input type="radio" value="5" name="page" id="5">5
+              </div>
+        </center>
+        <div id="resultList">
+        </div>
+
+      </div>
+
+      <div class="col-sm-4" style="background-color:red;">
+        <p>
+          <center>
+            <p>
+              You can also discover the most popular movies by which year they were released!
+              <p>
+                <form action="">
+                  <select id=mediaType>
+                      <option value=tv>TV Shows</option>
+                      <option value=movie>Movies</option>
+                  </select>
+                  <input type=text id=discoverResults size=5>
+                  <button type=button id=discovery>Discover This Year</button>
+                </form>
+          </center>
+          <p>
+            <div id="resultsList"></div>
+
+      </div>
+
+      <div class="col-sm-4" style="background-color:blue;">
+        <p>
+          <center>See Top TV Shows Right now!
+            <p>
+              <button type=button id=TVShows>Top TV Shows</button>
+          </center>
+          <div id="shows"></div>
+
+      </div>
+
+    </div>
+  </div>
+
+
+</body>
+
+</html>
